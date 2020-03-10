@@ -7,9 +7,16 @@ OBJ = obj
 
 CC ?= gcc
 CFLAGS := ${CFLAGS}
-CFLAGS += -Wall -Wextra -pedantic -O3
+CFLAGS += -Wall -Wextra -pedantic
 CFLAGS += -I $(INC)
 LDFLAGS := ${LDFLAGS}
+
+ifdef DEBUG
+	CFLAGS += -g -O0
+	LDFLAGS += -g
+else
+	CFLAGS += -O3
+endif
 
 MPI_CFLAGS = $(shell mpicc --showme:compile)
 MPI_LDFLAGS += $(shell mpicc --showme:link)

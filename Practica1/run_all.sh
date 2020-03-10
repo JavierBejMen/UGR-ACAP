@@ -24,24 +24,20 @@ gnuplot -e 'load "error_secuencial_estudio.p"'
 printf "Plot generado\n"
 
 # Calcular tiempo secuencial
-printf "Calculando tiempo secuencial\n"
-printf "1000000 --> "
-./bin/pi_secuencial 1000000
-printf "done\n"
-printf "10000000 --> "
-./bin/pi_secuencial 10000000
-printf "done\n"
-printf "100000000 --> "
-./bin/pi_secuencial 100000000
-printf "done\n"
-printf "1000000000 --> "
-./bin/pi_secuencial 1000000000
-printf "done\n"
-printf "10000000000 --> "
-./bin/pi_secuencial 10000000000
-printf "done\n"
-printf "100000000000 --> "
-./bin/pi_secuencial 100000000000
-printf "done\n"
+printf "Calculando tiempo secuencial (cpu)\n"
+for i in {100000000..1000000000..100000000}
+do
+  printf "%lu -->" $i
+  ./bin/pi_secuencial 1 $i
+  printf "done\n"
+done
+
+printf "Calculando tiempo secuencial (wall)\n"
+for i in {100000000..1000000000..100000000}
+do
+  printf "%lu -->" $i
+  ./bin/pi_secuencial 0 $i
+  printf "done\n"
+done
 
 printf "Tiempo secuencial generado\n"
