@@ -3,6 +3,7 @@
 #include <time.h>
 #include <math.h>
 #include "mpi.h"
+#include <time.h>
 
 #define PI 3.141592653589793238462643
 
@@ -16,7 +17,8 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  struct timespec start, end;
+  struct timespec start_comp, end_comp, start_reduce, end_reduce,
+                  start_crea, end_crea, start_dest, end_dest;
 
   double width, local_sum, x, error, global_sum;
   unsigned long intervals;
