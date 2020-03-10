@@ -14,7 +14,7 @@ LDFLAGS := ${LDFLAGS}
 MPI_CFLAGS = $(shell mpicc --showme:compile)
 MPI_LDFLAGS += $(shell mpicc --showme:link)
 
-TARGETS = clean $(BIN)/pi_lineal_estudio $(BIN)/pi_concurrente $(BIN)/pi_lineal
+TARGETS = clean $(BIN)/pi_secuencial_estudio $(BIN)/pi_concurrente $(BIN)/pi_secuencial
 ##### Dependency Rules ############################################################################
 
 .PHONY: clean run
@@ -22,16 +22,16 @@ TARGETS = clean $(BIN)/pi_lineal_estudio $(BIN)/pi_concurrente $(BIN)/pi_lineal
 
 all: $(TARGETS)
 
-$(BIN)/pi_lineal : $(OBJ)/pi_lineal.o
+$(BIN)/pi_secuencial : $(OBJ)/pi_secuencial.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
-$(OBJ)/pi_lineal.o : $(SRC)/pi_lineal.c
+$(OBJ)/pi_secuencial.o : $(SRC)/pi_secuencial.c
 	$(CC) -c $< $(CFLAGS) -o $@
 
-$(BIN)/pi_lineal_estudio : $(OBJ)/pi_lineal_estudio.o
+$(BIN)/pi_secuencial_estudio : $(OBJ)/pi_secuencial_estudio.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
-$(OBJ)/pi_lineal_estudio.o : $(SRC)/pi_lineal_estudio.c
+$(OBJ)/pi_secuencial_estudio.o : $(SRC)/pi_secuencial_estudio.c
 	$(CC) -c $< $(CFLAGS) -o $@
 
 $(BIN)/pi_concurrente :: $(OBJ)/pi_concurrente.o
@@ -41,7 +41,7 @@ $(OBJ)/%.o : $(SRC)/%.c
 	$(CC) -c $< $(CFLAGS) $(MPI_CFLAGS) -o $@
 
 run:
-	echo "RUNNNNNNNN"
+	sh run_all.sh
 
 clean:
 	rm -rf $(OBJ)/*.o $(BIN)/* $(DAT)/*

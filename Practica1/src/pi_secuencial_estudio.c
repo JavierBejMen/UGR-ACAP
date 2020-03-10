@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
-#define PI 3.14159265358979
+#define PI 3.141592653589793238462643
 
 int main(int argc, char **argv)
 {
@@ -57,8 +58,15 @@ int main(int argc, char **argv)
   sum *= width;
   error = fabs(sum/PI - 1);
 
-  printf("PI_est %0.14f\n", sum);
-  printf("Error %0.14f\n", error);
+  FILE *f;
+  char modo_s[40];
+  sprintf(modo_s, "data/secuencial_estudio_%i.dat", modo);
+
+  if((f=fopen(modo_s, "a+")) != NULL){
+    fprintf(f, "%d %0.14f\n", intervals, error);
+
+    fclose(f);
+  }
 
   exit(EXIT_SUCCESS);
 }
