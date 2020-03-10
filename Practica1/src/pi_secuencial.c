@@ -29,14 +29,14 @@ int main(int argc, char **argv)
   for(int j = 0; j < 3; ++j){
     sum = 0;
     /* do the computation */
-    clock_gettime(CLOCK_MONOTONIC, &start);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
     for (unsigned long i=0; i<intervals; ++i) {
       x = (i + 0.5) * width;
       sum += 4.0 / (1.0 + x * x);
     }
 
     sum *= width;
-    clock_gettime(CLOCK_MONOTONIC, &end);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end);
     time += (end.tv_nsec-start.tv_nsec);
     error += fabs(sum/PI - 1);
   }
