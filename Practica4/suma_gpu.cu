@@ -110,9 +110,9 @@ int main(int argc, char **argv) {
   }
 
   /** Traer resultado de dispositivo **/
-  printf("Copy output data from the CUDA device to the host memory\n");
+  printf("Traer resultado a memoria\n");
   if (cudaMemcpy(output, deviceOut, size, cudaMemcpyDeviceToHost) != cudaSuccess) {
-    fprintf(stderr, "Failed to copy vector C from device to host!\n");
+    perror("Error al traer resultado a memoria\n");
     exit(EXIT_FAILURE);
   }
 
@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
   }
 
   /** Escritura resultados **/
-  FILE * out;
+  FILE *out;
   char name_out[50];
   strcpy(name_out, argv[1]);
   strcat(name_out, "output_gpu.raw");
@@ -146,10 +146,14 @@ int main(int argc, char **argv) {
   if( ( out = fopen( name_out, "w" ) ) == NULL ) {
     printf( "No se pudo crear el archivo de salida %s\n", name_out);
   }
+  else{
+    for (int i = 0; i < nElementos; i++)
+      fprintf(out, "%.5f\n", output[i]);
 
-  for (int i = 0; i < nElementos; i++) {
-    fprintf(out, "%.5f\n", output[i]);
+    fclose(out);
   }
+
+
 
   /** Liberar y cerrar **/
   free(input0);
@@ -158,15 +162,19 @@ int main(int argc, char **argv) {
 
   fclose(in_0);
   fclose(in_1);
-  fclose(out);
+
 
   /** Archivo para plot **/
-  FILE * data;
-  data = fopen("data_gpu.dat", "a");
-  fprintf(data,"%d %f\n", nElementos,elapsed);
-  fclose(data);
+  FILE *data;
+  if( (data = fopen("data_gpu.dat", "a")) == NULL){
+    printf("No se pudo crear archivo para plot");
+  }
+  else{
+    fprintf(data,"%d %f\n", nElementos,elapsed);
+    fclose(data);
+  }
 
-  return EXIT_SUCCESS;
+  exit(EXIT_SUCCESS);
 }
 
 __global__ void operacion(const float *A, const float *B, float *C, int nElementos) {

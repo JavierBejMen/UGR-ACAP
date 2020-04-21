@@ -7,4 +7,6 @@ do
   ./suma_gpu $(echo "data/${i}/")
 done
 
+./gen_plot_data
+
 gnuplot -e 'load "plots.p"'

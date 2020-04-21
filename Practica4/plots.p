@@ -15,13 +15,16 @@ set style line 2 \
     linetype 1 linewidth 2
 
 set output 'cpu_lines.png'
-plot 'data_gpu.dat' using 1:2 title 'cpu' w lines linestyle 1
+plot 'data_cpu.dat' using 1:2 title 'cpu' w lines linestyle 1
 set output 'gpu_lines.png'
 plot 'data_gpu.dat' using 1:2 title 'gpu' w lines linestyle 2
 
 set output 'gpu_cpu_lines.png'
 plot 'data_cpu.dat' using 1:2 title 'cpu' w lines linestyle 1, \
      'data_gpu.dat' using 1:2 title 'gpu' w lines linestyle 2
+
+set output 'speedup.png'
+plot 'data_speedup.dat' u 1:2 title 'Ganancia' w lines linestyle 1
 
 set output 'cpu_bars.png'
 set style fill solid
@@ -30,3 +33,10 @@ plot '< sort -nk2 data_cpu.dat' using 2:xtic(1) title 'cpu' with boxes ls 1
 
 set output 'gpu_bars.png'
 plot '< sort -nk2 data_gpu.dat' using 2:xtic(1) title 'gpu' with boxes ls 2
+
+set output 'gpu_cpu_bars.png'
+
+set boxwidth 0.5
+set style fill solid
+plot 'data_bar.dat' every 2 using 1:3 title 'cpu' with boxes ls 2, \
+     'data_bar.dat' every 2::1 using 1:3:xtic(2) title 'gpu' with boxes ls 1

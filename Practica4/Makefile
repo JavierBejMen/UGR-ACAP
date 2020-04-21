@@ -4,7 +4,7 @@ NVCC = nvcc
 NVCFLAGS := ${CFLAGS}
 NVCFLAGS += -m64
 
-TARGETS = info suma_cpu suma_gpu
+TARGETS = info suma_cpu suma_gpu gen_plot_data
 
 all: clean $(TARGETS)
 
