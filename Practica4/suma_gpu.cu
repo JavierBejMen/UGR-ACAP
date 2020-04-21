@@ -6,11 +6,11 @@
 #include <helper_cuda.h>
 
 
-__global__ void operacion(const float *A, const float *B, float *C, int numElements)
+__global__ void operacion(const float *A, const float *B, float *C, int nElementos)
 {
   int i = blockDim.x * blockIdx.x + threadIdx.x;
 
-  if (i < numElements)
+  if (i < nElementos)
   {
     for(int j = 0; j < 1; ++j)
       C[i] = pow(pow(log(5*A[i]*100*B[i]+7*A[i])/0.33, 3), 7);
@@ -43,17 +43,17 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  int numElementsA, numElementsB, numElements;
-  fscanf(in_0, "%d", &numElementsA);
-  fscanf(in_1, "%d", &numElementsB);
-  if (numElementsA != numElementsB)
+  int nEle0, nEle1, nElementos;
+  fscanf(in_0, "%d", &nEle0);
+  fscanf(in_1, "%d", &nEle1);
+  if (nEle0 != nEle1)
   {
     fprintf(stderr, "Distinto tamaño de vectores\n");
     exit(EXIT_FAILURE);
   }
-  numElements = numElementsB;
-  size_t size = numElements * sizeof(float);
-  printf("Operacion sobre %d elementos\n", numElements);
+  nElementos = nEle1;
+  size_t size = nElementos * sizeof(float);
+  printf("Operacion sobre %d elementos\n", nElementos);
 
   /** Asignacion memoria **/
   float *input0 = (float *)malloc(size);
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 
   /** Inicializa vectores **/
   float aux;
-  for (int i = 0; i < numElements; ++i)
+  for (int i = 0; i < nElementos; ++i)
   {
     fscanf(in_0,"%f",&aux);
     input0[i] = aux;
@@ -117,9 +117,9 @@ int main(int argc, char **argv)
 
   /** Lanzar kernel **/
   int threadsPerBlock = 256;
-  int blocksPerGrid =(numElements + threadsPerBlock - 1) / threadsPerBlock;
+  int blocksPerGrid =(nElementos + threadsPerBlock - 1) / threadsPerBlock;
   printf("CUDA kernel: %d bloques de %d hebras\n", blocksPerGrid, threadsPerBlock);
-  operacion<<<blocksPerGrid, threadsPerBlock>>>(device0, device1, deviceOut, numElements);
+  operacion<<<blocksPerGrid, threadsPerBlock>>>(device0, device1, deviceOut, nElementos);
 
   cudaError_t err = cudaGetLastError();
 
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
     printf( "No se pudo crear la salida %s\n", name_out);
   }
 
-  for (int i = 0; i < numElements; i++)
+  for (int i = 0; i < nElementos; i++)
   {
     fprintf(out, "%.5f\n", output[i]);
   }
@@ -189,7 +189,7 @@ int main(int argc, char **argv)
   /** Archivo para plot **/
   FILE * data;
   data = fopen("data_gpu.dat", "a");
-  fprintf(data,"%d %f\n", numElements,elapsed);
+  fprintf(data,"%d %f\n", nElementos,elapsed);
   fclose(data);
 
   return EXIT_SUCCESS;

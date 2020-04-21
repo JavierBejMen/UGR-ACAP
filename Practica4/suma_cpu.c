@@ -31,17 +31,17 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  int numElementsA, numElementsB, numElements;
-  fscanf(in_0, "%d", &numElementsA);
-  fscanf(in_1, "%d", &numElementsB);
-  if (numElementsA != numElementsB)
+  int nEle0, nEle1, nElementos;
+  fscanf(in_0, "%d", &nEle0);
+  fscanf(in_1, "%d", &nEle1);
+  if (nEle0 != nEle1)
   {
     fprintf(stderr, "Distinto tamaño de vectores\n");
     exit(EXIT_FAILURE);
   }
-  numElements = numElementsB;
-  size_t size = numElements * sizeof(float);
-  printf("Operacion sobre %d elementos\n", numElements);
+  nElementos = nEle1;
+  size_t size = nElementos * sizeof(float);
+  printf("Operacion sobre %d elementos\n", nElementos);
 
   /** Asignacion memoria **/
   float *input0 = (float *)malloc(size);
@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 
   /** Inicializa vectores **/
   float aux;
-  for (int i = 0; i < numElements; ++i)
+  for (int i = 0; i < nElementos; ++i)
   {
     fscanf(in_0,"%f",&aux);
     input0[i] = aux;
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
   clock_t start, end;
   double elapsed;
   start = clock();
-  for (int i = 0; i < numElements; ++i)
+  for (int i = 0; i < nElementos; ++i)
   {
     for(int j = 0; j < 1; ++j)
 		  output[i] = pow(pow(log(5*input0[i]*100*input1[i]+7*input0[i])/0.33, 3), 7);
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
     printf( "No se pudo crear la salida %s\n", name_out);
   }
 
-  for (int i = 0; i < numElements; i++)
+  for (int i = 0; i < nElementos; i++)
   {
     fprintf(out, "%.5f\n", output[i]);
   }
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
   /** Archivo para plot **/
   FILE * data;
   data = fopen("data_cpu.dat", "a");
-  fprintf(data,"%d %f\n", numElements,elapsed);
+  fprintf(data,"%d %f\n", nElementos,elapsed);
   fclose(data);
 
   return EXIT_SUCCESS;
