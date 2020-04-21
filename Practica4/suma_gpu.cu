@@ -6,22 +6,18 @@
 #include <helper_cuda.h>
 
 
-__global__ void operacion(const float *A, const float *B, float *C, int nElementos)
-{
+__global__ void operacion(const float *A, const float *B, float *C, int nElementos) {
   int i = blockDim.x * blockIdx.x + threadIdx.x;
 
-  if (i < nElementos)
-  {
+  if (i < nElementos) {
     for(int j = 0; j < 1; ++j)
       C[i] = pow(pow(log(5*A[i]*100*B[i]+7*A[i])/0.33, 3), 7);
   }
 }
 
-int main(int argc, char **argv)
-{
-  if(argc<2)
-  {
-    printf("No se ha introducido el directorio de los vectores\n");
+int main(int argc, char **argv) {
+  if(argc<2) {
+    perror("No se ha introducido el directorio de los vectores\n");
     exit(EXIT_FAILURE);
   }
 
@@ -35,23 +31,22 @@ int main(int argc, char **argv)
   strcat(name_1, "input0.raw");
 
   if ( (in_0 = fopen(name_0,"r")) == NULL ) {
-    printf("Error en lectura %s\n", name_0);
+    fprintf(stderr, "Error en lectura %s\n", name_0);
     exit(EXIT_FAILURE);
   }
   if ( (in_1 = fopen(name_1, "r")) == NULL ){
-    printf("Error en lectura %s\n", name_1);
+    fprintf(stderr, "Error en lectura %s\n", name_1);
     exit(EXIT_FAILURE);
   }
 
   int nEle0, nEle1, nElementos;
   fscanf(in_0, "%d", &nEle0);
   fscanf(in_1, "%d", &nEle1);
-  if (nEle0 != nEle1)
-  {
-    fprintf(stderr, "Distinto tamaño de vectores\n");
+  if (nEle0 != nEle1) {
+    perror("Distinto tamaño de vectores\n");
     exit(EXIT_FAILURE);
   }
-  nElementos = nEle1;
+  nElementos = nEle0;
   size_t size = nElementos * sizeof(float);
   printf("Operacion sobre %d elementos\n", nElementos);
 
@@ -60,16 +55,14 @@ int main(int argc, char **argv)
   float *input1 = (float *)malloc(size);
   float *output = (float *)malloc(size);
 
-  if (input0 == NULL || input1 == NULL || output == NULL)
-  {
-    fprintf(stderr, "Error allocando memoria\n");
+  if (input0 == NULL || input1 == NULL || output == NULL) {
+    perror("Error allocando memoria\n");
     exit(EXIT_FAILURE);
   }
 
   /** Inicializa vectores **/
   float aux;
-  for (int i = 0; i < nElementos; ++i)
-  {
+  for (int i = 0; i < nElementos; ++i) {
     fscanf(in_0,"%f",&aux);
     input0[i] = aux;
     fscanf(in_1,"%f",&aux);
@@ -78,23 +71,20 @@ int main(int argc, char **argv)
 
   /** Asignacion memoria cuda **/
   float *device0 = NULL;
-  if (cudaMalloc((void **)&device0, size) != cudaSuccess)
-  {
-    fprintf(stderr, "Error allocando device 0\n");
+  if (cudaMalloc((void **)&device0, size) != cudaSuccess) {
+    perror("Error allocando device 0\n");
     exit(EXIT_FAILURE);
   }
 
   float *device1 = NULL;
-  if (cudaMalloc((void **)&device1, size) != cudaSuccess)
-  {
-    fprintf(stderr, "Error alocando device 1\n");
+  if (cudaMalloc((void **)&device1, size) != cudaSuccess) {
+    perror("Error alocando device 1\n");
     exit(EXIT_FAILURE);
   }
 
   float *deviceOut = NULL;
-  if (cudaMalloc((void **)&deviceOut, size) != cudaSuccess)
-  {
-    fprintf(stderr, "Error alocando device out\n");
+  if (cudaMalloc((void **)&deviceOut, size) != cudaSuccess) {
+    perror("Error alocando device out\n");
     exit(EXIT_FAILURE);
   }
 
@@ -103,15 +93,13 @@ int main(int argc, char **argv)
   start = clock();
 
   /** Enviar datos a dispositivo **/
-  if (cudaMemcpy(device0, input0, size, cudaMemcpyHostToDevice) != cudaSuccess)
-  {
-    fprintf(stderr, "Error copiando input0 a device0\n");
+  if (cudaMemcpy(device0, input0, size, cudaMemcpyHostToDevice) != cudaSuccess) {
+    perror("Error copiando input0 a device0\n");
     exit(EXIT_FAILURE);
   }
 
-  if (cudaMemcpy(device1, input1, size, cudaMemcpyHostToDevice) != cudaSuccess)
-  {
-    fprintf(stderr, "Error copiando input1 a device1\n");
+  if (cudaMemcpy(device1, input1, size, cudaMemcpyHostToDevice) != cudaSuccess) {
+    perror("Error copiando input1 a device1\n");
     exit(EXIT_FAILURE);
   }
 
@@ -123,16 +111,14 @@ int main(int argc, char **argv)
 
   cudaError_t err = cudaGetLastError();
 
-  if (err != cudaSuccess)
-  {
+  if (err != cudaSuccess) {
     fprintf(stderr, "Error en la ejecucion del kernel CUDA\n", cudaGetErrorString(err));
     exit(EXIT_FAILURE);
   }
 
   /** Traer resultado de dispositivo **/
   printf("Copy output data from the CUDA device to the host memory\n");
-  if (cudaMemcpy(output, deviceOut, size, cudaMemcpyDeviceToHost) != cudaSuccess)
-  {
+  if (cudaMemcpy(output, deviceOut, size, cudaMemcpyDeviceToHost) != cudaSuccess) {
     fprintf(stderr, "Failed to copy vector C from device to host!\n");
     exit(EXIT_FAILURE);
   }
@@ -143,21 +129,18 @@ int main(int argc, char **argv)
   printf("Operacion terminada: %f segundos\n", elapsed);
 
   /** Liberar memoria de dispositivo **/
-  if (cudaFree(device0) != cudaSuccess)
-  {
-    fprintf(stderr, "Failed to free device vector A!\n");
+  if (cudaFree(device0) != cudaSuccess) {
+    perror("Error al liberar device0\n");
     exit(EXIT_FAILURE);
   }
 
-  if (cudaFree(device1) != cudaSuccess)
-  {
-    fprintf(stderr, "Failed to free device vector B!\n");
+  if (cudaFree(device1) != cudaSuccess) {
+    perror("Error al liberar device1\n");
     exit(EXIT_FAILURE);
   }
 
-  if (cudaFree(deviceOut) != cudaSuccess)
-  {
-    fprintf(stderr, "Failed to free device vector C!\n");
+  if (cudaFree(deviceOut) != cudaSuccess) {
+    perror("Error al liberar deviceOut\n");
     exit(EXIT_FAILURE);
   }
 
@@ -167,13 +150,11 @@ int main(int argc, char **argv)
   strcpy(name_out, argv[1]);
   strcat(name_out, "output_gpu.raw");
 
-  if( ( out = fopen( name_out, "w" ) ) == NULL )
-  {
-    printf( "No se pudo crear la salida %s\n", name_out);
+  if( ( out = fopen( name_out, "w" ) ) == NULL ) {
+    printf( "No se pudo crear el archivo de salida %s\n", name_out);
   }
 
-  for (int i = 0; i < nElementos; i++)
-  {
+  for (int i = 0; i < nElementos; i++) {
     fprintf(out, "%.5f\n", output[i]);
   }
 
