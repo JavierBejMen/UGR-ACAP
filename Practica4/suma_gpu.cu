@@ -5,15 +5,8 @@
 #include <cuda_runtime.h>
 #include <helper_cuda.h>
 
-
-__global__ void operacion(const float *A, const float *B, float *C, int nElementos) {
-  int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-  if (i < nElementos) {
-    for(int j = 0; j < 1; ++j)
-      C[i] = pow(pow(log(5*A[i]*100*B[i]+7*A[i])/0.33, 3), 7);
-  }
-}
+/** Operacion con los vectores en la GPU **/
+__global__ void operacion(const float *A, const float *B, float *C, int nElementos);
 
 int main(int argc, char **argv) {
   if(argc<2) {
@@ -174,4 +167,13 @@ int main(int argc, char **argv) {
   fclose(data);
 
   return EXIT_SUCCESS;
+}
+
+__global__ void operacion(const float *A, const float *B, float *C, int nElementos) {
+  int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+  if (i < nElementos) {
+    for(int j = 0; j < 1; ++j)
+      C[i] = pow(pow(log(5*A[i]*100*B[i]+7*A[i])/0.33, 3), 7);
+  }
 }
