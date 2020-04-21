@@ -7,8 +7,7 @@
 
 int main(int argc, char **argv)
 {
-  if(argc<2)
-  {
+  if(argc<2){
     printf("No se ha introducido el directorio de los vectores\n");
     exit(EXIT_FAILURE);
   }
@@ -34,8 +33,7 @@ int main(int argc, char **argv)
   int nEle0, nEle1, nElementos;
   fscanf(in_0, "%d", &nEle0);
   fscanf(in_1, "%d", &nEle1);
-  if (nEle0 != nEle1)
-  {
+  if (nEle0 != nEle1){
     fprintf(stderr, "Distinto tamaño de vectores\n");
     exit(EXIT_FAILURE);
   }
@@ -48,16 +46,14 @@ int main(int argc, char **argv)
   float *input1 = (float *)malloc(size);
   float *output = (float *)malloc(size);
 
-  if (input0 == NULL || input1 == NULL || output == NULL)
-  {
+  if (input0 == NULL || input1 == NULL || output == NULL){
     fprintf(stderr, "Error allocando memoria\n");
     exit(EXIT_FAILURE);
   }
 
   /** Inicializa vectores **/
   float aux;
-  for (int i = 0; i < nElementos; ++i)
-  {
+  for (int i = 0; i < nElementos; ++i){
     fscanf(in_0,"%f",&aux);
     input0[i] = aux;
     fscanf(in_1,"%f",&aux);
@@ -68,9 +64,8 @@ int main(int argc, char **argv)
   clock_t start, end;
   double elapsed;
   start = clock();
-  for (int i = 0; i < nElementos; ++i)
-  {
-    for(int j = 0; j < 1; ++j)
+  for (int i = 0; i < nElementos; ++i){
+    //for(int j = 0; j < 1; ++j)
 		  output[i] = pow(pow(log(5*input0[i]*100*input1[i]+7*input0[i])/0.33, 3), 7);
   }
   end = clock();
@@ -84,13 +79,11 @@ int main(int argc, char **argv)
   strcpy(name_out, argv[1]);
   strcat(name_out, "output_cpu.raw");
 
-  if( ( out = fopen( name_out, "w" ) ) == NULL )
-  {
+  if( ( out = fopen( name_out, "w" ) ) == NULL ){
     printf( "No se pudo crear la salida %s\n", name_out);
   }
 
-  for (int i = 0; i < nElementos; i++)
-  {
+  for (int i = 0; i < nElementos; i++){
     fprintf(out, "%.5f\n", output[i]);
   }
 
