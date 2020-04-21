@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
   }
 
   /** Lanzar kernel **/
-  int threadsPerBlock = 256;
+  int threadsPerBlock = 512;
   int blocksPerGrid =(nElementos + threadsPerBlock - 1) / threadsPerBlock;
   printf("CUDA kernel: %d bloques de %d hebras\n", blocksPerGrid, threadsPerBlock);
   operacion<<<blocksPerGrid, threadsPerBlock>>>(device0, device1, deviceOut, nElementos);
