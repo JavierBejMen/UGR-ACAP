@@ -1,0 +1,9 @@
+# .ccls
+.ccls-cache/*
+
+# bin
+info
+suma_cpu
+suma_gpu
+*.png
+*.dat
