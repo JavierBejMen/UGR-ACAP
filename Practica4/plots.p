@@ -38,5 +38,5 @@ set output 'gpu_cpu_bars.png'
 
 set boxwidth 0.5
 set style fill solid
-plot 'data_bar.dat' every 2 using 1:3 title 'cpu' with boxes ls 2, \
-     'data_bar.dat' every 2::1 using 1:3:xtic(2) title 'gpu' with boxes ls 1
+plot '< sort -nk1 data_bar.dat' every 2 using 1:3 title 'cpu' with boxes ls 2, \
+     '< sort -nk1 data_bar.dat' every 2::1 using 1:3:xtic(2) title 'gpu' with boxes ls 1
