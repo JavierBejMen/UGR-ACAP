@@ -65,3 +65,4 @@ dkms.conf
 .history
 
 # End of https://www.toptal.com/developers/gitignore/api/c,visualstudiocode
+Practica1/data/*
