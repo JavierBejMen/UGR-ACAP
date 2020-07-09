@@ -18,7 +18,8 @@ int main(int argc, char **argv)
   }
 
   //clock
-  double time_crea, time_comp, time_reduce, time_dets;
+  double time_crea, time_comp, global_time_comp, time_reduce;
+  double total_time_comp=0, total_time_reduce=0;
   long seconds, ns;
   int clk_modo;
   switch (atoi(argv[1])) {
@@ -35,11 +36,12 @@ int main(int argc, char **argv)
   }
 
   struct timespec start_comp, end_comp, start_reduce, end_reduce,
-                  start_crea, end_crea, start_dest, end_dest;
+                  start_crea, end_crea;
 
   // Variables de computo
   double width, x;
   long double local_sum, global_sum, error;
+  long double total_sum=0, total_error=0;
   unsigned long intervals, local_intervals, bot, top;
 
   intervals = atoi(argv[2]);
@@ -48,7 +50,7 @@ int main(int argc, char **argv)
 
   // Zona MPI
   time_crea = 0;
-  int mi_rank, p, source, dest;
+  int mi_rank, p;
 
   clock_gettime(clk_modo, &start_crea);
 
@@ -75,26 +77,85 @@ int main(int argc, char **argv)
       ns += 1000000000;
     }
 
-    time_crea += seconds + (double)ns/(double)1000000000;
+    time_crea = seconds + (double)ns/(double)1000000000;
+  }
+  //3 times experiment
+  for (int i = 0; i < 3; i++){
+    local_sum = 0;
+    //Computo
+    clock_gettime(clk_modo, &start_comp);
+
+    for (unsigned long i=bot; i<top; ++i) {
+      x = (i + 0.5) * width;
+      local_sum += 4.0 / (1.0 + x * x);
+    }
+
+    clock_gettime(clk_modo, &end_comp);
+    seconds = end_comp.tv_sec-start_comp.tv_sec;
+    ns = end_comp.tv_nsec-start_comp.tv_nsec;
+
+    //underflow
+    if(start_comp.tv_nsec > end_comp.tv_nsec){
+      --seconds;
+      ns += 1000000000;
+    }
+
+    time_comp = seconds + (double)ns/(double)1000000000;
+
+    //Get max comp time
+    MPI_Reduce(&time_comp,
+              &global_time_comp,
+              1,
+              MPI_DOUBLE,
+              MPI_MAX,
+              0,
+              MPI_COMM_WORLD);
+
+    //Reduce
+    if(mi_rank == 0)
+      clock_gettime(clk_modo, &start_reduce);
+
+    MPI_Reduce(&local_sum,
+              &global_sum,
+              1,
+              MPI_LONG_DOUBLE,
+              MPI_SUM,
+              0,
+              MPI_COMM_WORLD);
+
+    if(mi_rank == 0){
+      global_sum *= width;
+
+      clock_gettime(clk_modo, &end_reduce);
+      seconds = end_reduce.tv_sec-start_reduce.tv_sec;
+      ns = end_reduce.tv_nsec-start_reduce.tv_nsec;
+
+      //underflow
+      if(start_reduce.tv_nsec > end_reduce.tv_nsec){
+        --seconds;
+        ns += 1000000000;
+      }
+
+      time_reduce = seconds + (double)ns/(double)1000000000;
+      printf("AJA %f\n", time_reduce);
+
+      error = fabsl(PI-global_sum);
+      total_error += error;
+      total_sum += global_sum;
+      total_time_comp += global_time_comp;
+      total_time_reduce += time_reduce;
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
   }
 
-  for (unsigned long i=bot; i<top; ++i) {
-    x = (i + 0.5) * width;
-    local_sum += 4.0 / (1.0 + x * x);
-  }
+  if (mi_rank == 0){
+    total_error /= 3;
+    total_sum /= 3;
+    total_time_comp /= 3;
+    total_time_reduce /= 3;
 
-  MPI_Reduce(&local_sum,
-             &global_sum,
-             1,
-             MPI_LONG_DOUBLE,
-             MPI_SUM,
-             0,
-             MPI_COMM_WORLD);
-
-  if(mi_rank == 0){
-    global_sum *= width;
-    error = fabsl(PI-global_sum);
-    printf("%lu %f %0.25Lf %Le\n", intervals, time_crea, global_sum, error);
+    printf("%lu %f %f %f %0.25Lf %Le\n", intervals, time_crea, total_time_comp, total_time_reduce, total_sum, total_error);
   }
 
   MPI_Finalize();
