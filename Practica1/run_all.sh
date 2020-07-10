@@ -59,11 +59,15 @@ done
 
 printf "Tiempo concurrente generado\n"
 
-echo "Generando graficas:\n"
+printf "Generando graficas:\n"
 
 printf "Estudio error secuencial -->"
 gnuplot -e 'load "error_secuencial_estudio.p"'
-echo " OK\n"
+printf " OK\n"
+
+printf "Estudio error secuencial -->"
+gnuplot -e 'load "secuencial_concurrente_estudio.p"'
+printf " OK\n"
 
 
 
