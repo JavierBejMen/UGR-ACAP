@@ -47,8 +47,11 @@ $(BIN)/pi_concurrente :: $(OBJ)/pi_concurrente.o
 $(OBJ)/%.o : $(SRC)/%.c
 	$(CC) -c $< $(CFLAGS) $(MPI_CFLAGS) -o $@
 
-run:
+run: clean_data
 	sh run_all.sh
 
 clean:
 	rm -rf $(OBJ)/*.o $(BIN)/* $(DAT)/*
+
+clean_data:
+	rm -rf $(DAT)/*

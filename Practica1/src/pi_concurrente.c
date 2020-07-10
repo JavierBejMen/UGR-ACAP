@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include "mpi.h"
+#include <mpi.h>
 #include <time.h>
+#include <string.h>
 
 #define PI 3.141592653589793238462643
 
@@ -137,7 +138,6 @@ int main(int argc, char **argv)
       }
 
       time_reduce = seconds + (double)ns/(double)1000000000;
-      printf("AJA %f\n", time_reduce);
 
       error = fabsl(PI-global_sum);
       total_error += error;
@@ -155,7 +155,28 @@ int main(int argc, char **argv)
     total_time_comp /= 3;
     total_time_reduce /= 3;
 
-    printf("%lu %f %f %f %0.25Lf %Le\n", intervals, time_crea, total_time_comp, total_time_reduce, total_sum, total_error);
+    // Output
+    FILE *f;
+
+    char f_name[50];
+    switch (atoi(argv[1])) {
+      case 0:
+        sprintf(f_name, "data/concurrente_wall_%d.dat", p);
+        break;
+      case 1:
+        sprintf(f_name, "data/concurrente_cpu_%d.dat", p);
+        break;
+      default:
+        perror("Error: modo de reloj desconocido");
+        printf("Modo reloj soportado: [0][1]");
+        exit(EXIT_FAILURE);
+    }
+
+    if((f=fopen(f_name, "a+")) != NULL){
+      fprintf(f, "%lu %f %f %f %0.25Lf %Le\n", intervals, time_crea, total_time_comp, total_time_reduce, total_sum, total_error);
+
+      fclose(f);
+    }
   }
 
   MPI_Finalize();

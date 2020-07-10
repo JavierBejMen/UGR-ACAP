@@ -19,25 +19,54 @@ done
 
 printf "Datos generados\n"
 
-gnuplot -e 'load "error_secuencial_estudio.p"'
-
-printf "Plot generado\n"
-
 # Calcular tiempo secuencial
 printf "Calculando tiempo secuencial (cpu)\n"
-for i in {100000000..1000000000..100000000}
+for i in {120000000..1080000000..120000000}
 do
   printf "%lu -->" $i
   ./bin/pi_secuencial 1 $i
-  printf "done\n"
+  printf " OK\n"
 done
 
 printf "Calculando tiempo secuencial (wall)\n"
-for i in {100000000..1000000000..100000000}
+for i in {120000000..1080000000..120000000}
 do
   printf "%lu -->" $i
   ./bin/pi_secuencial 0 $i
-  printf "done\n"
+  printf " OK\n"
 done
 
 printf "Tiempo secuencial generado\n"
+
+for j in {2..8..2}
+do
+  printf "Calculando tiempo concurrente (cpu)(p=%d)\n" $j
+  for i in {120000000..1080000000..120000000}
+  do
+    printf "%lu -->" $i
+    mpirun --use-hwthread-cpus -np $j ./bin/pi_concurrente 1 $i
+    printf " OK\n"
+  done
+
+  printf "Calculando tiempo concurrente (wall)(p=%d)\n" $j
+  for i in {120000000..1080000000..120000000}
+  do
+    printf "%lu -->" $i
+    mpirun --use-hwthread-cpus -np $j ./bin/pi_concurrente 0 $i
+    printf " OK\n"
+  done
+done
+
+printf "Tiempo concurrente generado\n"
+
+echo "Generando graficas:\n"
+
+printf "Estudio error secuencial -->"
+gnuplot -e 'load "error_secuencial_estudio.p"'
+echo " OK\n"
+
+
+
+
+
+
