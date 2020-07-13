@@ -31,13 +31,13 @@ TARGETS = clean $(BIN)/gauss_secuencial $(BIN)/mpi_gauss
 
 all: $(TARGETS)
 
-$(BIN)/gauss_secuencial : $(OBJ)/libbmp.o $(OBJ)/gauss_secuencial.o
+$(BIN)/gauss_secuencial : $(OBJ)/libbmp.o $(OBJ)/gauss.o $(OBJ)/gauss_secuencial.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
 $(OBJ)/%.o : $(SRC)/%.c
 	$(CC) -c $< $(CFLAGS) -o $@
 
-$(BIN)/mpi_gauss : $(OBJ)/libbmp.o $(OBJ)/mpi_gauss.o
+$(BIN)/mpi_gauss : $(OBJ)/libbmp.o $(OBJ)/mpi_gauss.o $(OBJ)/matrix_helper.o
 	$(CC) $^ $(LDFLAGS) $(MPI_LDFLAGS) -o $@
 
 $(OBJ)/%.o : $(SRC)/mpi_%.c
